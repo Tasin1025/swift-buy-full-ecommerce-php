@@ -100,11 +100,12 @@ $user = $result->fetch_assoc();
                         <div class="p-4">
                             <h3 class="text-lg font-semibold">' . htmlspecialchars($row['name'], ENT_QUOTES) . '</h3>
                             <p class="text-indigo-600 font-bold">' . number_format($row['price'], 2) . ' Taka</p>
-                            <form method="POST" action="add_to_cart.php">
-                                <input type="hidden" name="product_name" value="' . htmlspecialchars($row['name'], ENT_QUOTES) . '">
-                                <input type="hidden" name="product_price" value="' . $row['price'] . '">
-                                <button type="submit" class="bg-indigo-600 text-white px-4 py-2 rounded-md hover:bg-indigo-700">Add to Cart</button>
-                            </form>
+                           <form method="POST" action="add_to_cart.php">
+    <input type="hidden" name="product_name" value="' . htmlspecialchars($row['name'], ENT_QUOTES) . '">
+    <input type="hidden" name="product_price" value="' . $row['price'] . '">
+    <button type="submit" class="bg-indigo-600 text-white px-4 py-2 rounded-md hover:bg-indigo-700">Add to Cart</button>
+</form>
+
                         </div>
                     </div>
                 ';
