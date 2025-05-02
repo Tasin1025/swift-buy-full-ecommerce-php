@@ -86,34 +86,38 @@ $user = $result->fetch_assoc();
 
     <!-- Products Section -->
     <div id="products" class="container mx-auto p-6 mt-10 bg-white shadow-md rounded-lg max-w-4xl">
-        <h2 class="text-3xl font-semibold text-center mb-6">Our Bestsellers</h2>
-        <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-8">
-            <?php
-            // Fetch products from the database
-            $sql = "SELECT * FROM products";
-            $result = $conn->query($sql);
-            if ($result->num_rows > 0) {
-                while ($row = $result->fetch_assoc()) {
-                    echo '
-                        <div class="product bg-white shadow-md rounded-lg overflow-hidden text-center">
-                            <img src="uploads/' . $row['image'] . '" alt="' . htmlspecialchars($row['name'], ENT_QUOTES) . '" class="w-full h-48 object-cover">
-                            <div class="p-4">
-                                <h3 class="text-lg font-semibold">' . htmlspecialchars($row['name'], ENT_QUOTES) . '</h3>
-                                <p class="text-indigo-600 font-bold">' . number_format($row['price'], 2) . ' Taka</p>
-                                <form method="POST" action="add_to_cart.php">
-                                    <input type="hidden" name="product_name" value="' . htmlspecialchars($row['name'], ENT_QUOTES) . '">
-                                    <input type="hidden" name="product_price" value="' . $row['price'] . '">
-                                    <button type="submit" class="bg-indigo-600 text-white px-4 py-2 rounded-md hover:bg-indigo-700">Add to Cart</button>
-                                </form>
-                            </div>
+    <h2 class="text-3xl font-semibold text-center mb-6">Our Bestsellers</h2>
+    <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-8">
+        <?php
+        // Fetch products from the database
+        $sql = "SELECT * FROM products";
+        $result = $conn->query($sql);
+        if ($result->num_rows > 0) {
+            while ($row = $result->fetch_assoc()) {
+                echo '
+                    <div class="product bg-white shadow-md rounded-lg overflow-hidden text-center">
+                        <img src="' . $row['image'] . '" alt="' . htmlspecialchars($row['name'], ENT_QUOTES) . '" class="w-full h-48 object-cover">
+                        <div class="p-4">
+                            <h3 class="text-lg font-semibold">' . htmlspecialchars($row['name'], ENT_QUOTES) . '</h3>
+                            <p class="text-indigo-600 font-bold">' . number_format($row['price'], 2) . ' Taka</p>
+                            <form method="POST" action="add_to_cart.php">
+                                <input type="hidden" name="product_name" value="' . htmlspecialchars($row['name'], ENT_QUOTES) . '">
+                                <input type="hidden" name="product_price" value="' . $row['price'] . '">
+                                <button type="submit" class="bg-indigo-600 text-white px-4 py-2 rounded-md hover:bg-indigo-700">Add to Cart</button>
+                            </form>
                         </div>
-                    ';
-                }
-            } else {
-                echo "<p>No products found!</p>";
+                    </div>
+                ';
             }
-            ?>
-        </div>
+        } else {
+            echo "<p>No products found!</p>";
+        }
+        ?>
+    </div>
+</div>
+
+</div>
+
     </div>
 
     <!-- Contact Us Section -->

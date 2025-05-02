@@ -1,3 +1,30 @@
+<?php
+// Start the session
+session_start();
+
+// Check if user is logged in
+if (isset($_SESSION['user_id'])) {
+    // Fetch user data from the database to check their role
+    include 'db_config.php';
+    $user_id = $_SESSION['user_id'];
+    
+    $stmt = $conn->prepare("SELECT role FROM users WHERE id = ?");
+    $stmt->bind_param("i", $user_id);
+    $stmt->execute();
+    $result = $stmt->get_result();
+    $user = $result->fetch_assoc();
+
+    // Redirect based on user role
+    if ($user['role'] == 'admin') {
+        header("Location: admin_dashboard.php");
+        exit();
+    } else {
+        header("Location: user_dashboard.php");
+        exit();
+    }
+}
+?>
+
 <!DOCTYPE html>
 <html lang="en">
 
@@ -20,6 +47,7 @@
 </head>
 
 <body class="bg-gray-100 text-gray-800">
+    <!-- Header -->
     <header class="flex justify-between items-center px-6 py-4 bg-white bg-opacity-80 shadow-md">
         <div class="text-2xl font-bold text-indigo-600">Swift Buy 🛒</div>
         <div>

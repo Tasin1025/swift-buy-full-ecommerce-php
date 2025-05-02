@@ -27,6 +27,26 @@ if (isset($_GET['action']) && $_GET['action'] === 'clear') {
         echo "Error clearing cart.";
     }
 }
+
+// Update quantity if form is submitted
+if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['update_quantity'])) {
+    $id = intval($_POST['id']);
+    $quantity = intval($_POST['quantity']);
+
+    // Ensure the quantity is a valid number
+    if ($quantity > 0) {
+        $stmt = $conn->prepare("UPDATE cart SET quantity = ? WHERE id = ?");
+        $stmt->bind_param("ii", $quantity, $id);
+
+        if ($stmt->execute()) {
+            header("Location: cart.php");
+            exit();
+        } else {
+            echo "Error updating quantity.";
+        }
+        $stmt->close();
+    }
+}
 ?>
 
 <!DOCTYPE html>
@@ -81,6 +101,7 @@ if (isset($_GET['action']) && $_GET['action'] === 'clear') {
                     <tr class="bg-gray-100">
                         <th class="px-4 py-2 text-left">Product Name</th>
                         <th class="px-4 py-2 text-left">Price (Taka)</th>
+                        <th class="px-4 py-2 text-left">Quantity</th>
                         <th class="px-4 py-2 text-left">Action</th>
                     </tr>
                 </thead>
@@ -94,11 +115,18 @@ if (isset($_GET['action']) && $_GET['action'] === 'clear') {
 
                     if ($result->num_rows > 0) {
                         while ($row = $result->fetch_assoc()) {
-                            $total += $row['product_price'];
+                            $total += $row['product_price'] * $row['quantity'];
                             echo '
                                 <tr class="border-b">
                                     <td class="px-4 py-2">' . htmlspecialchars($row['product_name'], ENT_QUOTES) . '</td>
                                     <td class="px-4 py-2">' . number_format($row['product_price'], 2) . '</td>
+                                    <td class="px-4 py-2">
+                                        <form method="POST" action="cart.php">
+                                            <input type="hidden" name="id" value="' . $row['id'] . '">
+                                            <input type="number" name="quantity" value="' . $row['quantity'] . '" min="1" class="w-16 p-2 text-center border border-gray-300 rounded-md">
+                                            <button type="submit" name="update_quantity" class="ml-2 bg-blue-600 text-white px-4 py-2 rounded-md hover:bg-blue-700">Update</button>
+                                        </form>
+                                    </td>
                                     <td class="px-4 py-2">
                                         <a href="cart.php?id=' . $row['id'] . '" class="bg-red-600 text-white px-4 py-2 rounded-md hover:bg-red-700">Delete</a>
                                     </td>
@@ -106,11 +134,11 @@ if (isset($_GET['action']) && $_GET['action'] === 'clear') {
                             ';
                         }
                     } else {
-                        echo "<tr><td colspan='3' class='text-center py-4'>Your cart is empty!</td></tr>";
+                        echo "<tr><td colspan='4' class='text-center py-4'>Your cart is empty!</td></tr>";
                     }
                     ?>
                     <tr>
-                        <td colspan="2" class="px-4 py-2 text-right font-bold">Total</td>
+                        <td colspan="3" class="px-4 py-2 text-right font-bold">Total</td>
                         <td class="px-4 py-2 text-left text-indigo-600 font-bold"><?php echo number_format($total, 2); ?> Taka</td>
                     </tr>
                 </tbody>
