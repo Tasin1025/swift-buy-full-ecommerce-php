@@ -1,12 +1,13 @@
 <?php
-include 'db_config.php';
+// Start the session and check if the user is logged in
 session_start();
-
 if (!isset($_SESSION['user_id'])) {
     header("Location: login.php");
     exit();
 }
 
+// Include the database configuration file
+include 'db_config.php';
 $user_id = $_SESSION['user_id'];
 $payment_method = '';
 $address = '';
@@ -48,7 +49,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['update_quantity'])) {
 
     // Ensure the quantity is a valid number
     if ($quantity > 0) {
-        // Prepare and execute the update query
         $stmt = $conn->prepare("UPDATE cart SET quantity = ? WHERE id = ?");
         $stmt->bind_param("ii", $quantity, $id);
 
@@ -68,6 +68,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['update_quantity'])) {
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $payment_method = $_POST['payment_method'];
     $address = $_POST['address']; 
+    
     // Calculate total
     $total = 0;
     $product_details = [];
@@ -79,6 +80,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $stmt->execute();
     $result = $stmt->get_result();
 
+    // Store product details and calculate total
     while ($row = $result->fetch_assoc()) {
         $total += $row['product_price'] * $row['quantity'];
         $product_details[] = [
@@ -98,8 +100,14 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
         // Insert products into order_items table
         foreach ($product_details as $product) {
+            // Insert order items into order_items table
             $stmt = $conn->prepare("INSERT INTO order_items (order_id, product_name, product_price, quantity) VALUES (?, ?, ?, ?)");
             $stmt->bind_param("isdi", $order_id, $product['product_name'], $product['product_price'], $product['quantity']);
+            $stmt->execute();
+
+            // Update the stock in the products table
+            $stmt = $conn->prepare("UPDATE products SET stock = stock - ? WHERE name = ?");
+            $stmt->bind_param("is", $product['quantity'], $product['product_name']);
             $stmt->execute();
         }
 
@@ -245,10 +253,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             </div>
         </form>
     </div>
-    
-    <footer class="mt-4 text-center py-6 bg-gray-200 text-gray-600">
-        <p>&copy; 2025 Swift Buy 🛒 | All Rights Reserved</p>
-    </footer>
 </body>
 
 </html>
