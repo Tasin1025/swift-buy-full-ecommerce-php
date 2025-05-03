@@ -28,7 +28,7 @@ SwiftBuy is an e-commerce website built using **HTML**, **CSS**, **JavaScript**,
 Follow these steps to set up the project locally:
 
 1. **Clone the Repository**:
-   ```bash
+   ```
    git clone https://github.com/Tasin1025/swift-buy-full-ecommerce-php
     ```
 2. **Place the Project in the XAMPP `htdocs` Folder:**
@@ -45,6 +45,16 @@ Follow these steps to set up the project locally:
 5. **Access the Project:**
 - Open your browser and navigate to `http://localhost/swiftbuy`.
 - The website should now be running locally.
+## Live Website
+ [Placeholder for Live Website Link]
+## Login Credentials
+**Admin Login:**
+Email: admin@gmail.com
+ Password: tasin1234
+
+**User Login:**
+Email: tasin@gmail.com
+ Password: tasin1234
 
 ## Usage
 
