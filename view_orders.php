@@ -17,20 +17,47 @@ $stmt->execute();
 $result = $stmt->get_result();
 $user = $result->fetch_assoc();
 
+
 // Handle order deletion
-if (isset($_GET['id'])) {
+if (isset($_GET['id']) && isset($_GET['action']) && $_GET['action'] == 'delete') {
     $order_id = intval($_GET['id']);
 
-    // Delete order from the database
-    $stmt = $conn->prepare("DELETE FROM orders WHERE id = ?");
+    // Delete related order items first
+    $stmt = $conn->prepare("DELETE FROM order_items WHERE order_id = ?");
     $stmt->bind_param("i", $order_id);
+    if ($stmt->execute()) {
+        // Now delete the order itself
+        $stmt = $conn->prepare("DELETE FROM orders WHERE id = ?");
+        $stmt->bind_param("i", $order_id);
+        if ($stmt->execute()) {
+            echo "<script>alert('Order deleted successfully!');</script>";
+            header("Location: view_orders.php"); // Redirect to orders page
+            exit();
+        } else {
+            echo "<script>alert('Error deleting order.');</script>";
+        }
+    } else {
+        echo "<script>alert('Error deleting related order items.');</script>";
+    }
+    $stmt->close();
+}
+
+
+// Handle order status update
+if (isset($_POST['update_status'])) {
+    $order_id = intval($_POST['order_id']);
+    $status = $_POST['status'];
+
+    // Update status in the database
+    $stmt = $conn->prepare("UPDATE orders SET status = ? WHERE id = ?");
+    $stmt->bind_param("si", $status, $order_id);
 
     if ($stmt->execute()) {
-        echo "<script>alert('Order deleted successfully!');</script>";
+        echo "<script>alert('Order status updated successfully!');</script>";
         header("Location: view_orders.php"); // Redirect to orders page
         exit();
     } else {
-        echo "<script>alert('Error deleting order.');</script>";
+        echo "<script>alert('Error updating order status.');</script>";
     }
     $stmt->close();
 }
@@ -55,11 +82,11 @@ if (isset($_GET['id'])) {
             background-attachment: fixed;
             display: flex;
             flex-direction: column;
-            min-height: 100vh; /* Ensure full height */
+            min-height: 100vh;
         }
 
         main {
-            flex-grow: 1; /* This will push the footer down */
+            flex-grow: 1;
         }
     </style>
 </head>
@@ -105,16 +132,38 @@ if (isset($_GET['id'])) {
 
                     if ($result->num_rows > 0) {
                         while ($order = $result->fetch_assoc()) {
+                            // Get the product names for the order
+                            $order_items_sql = "SELECT * FROM order_items WHERE order_id = ?";
+                            $stmt = $conn->prepare($order_items_sql);
+                            $stmt->bind_param("i", $order['id']);
+                            $stmt->execute();
+                            $order_items_result = $stmt->get_result();
+                            $products = '';
+                            while ($item = $order_items_result->fetch_assoc()) {
+                                $products .= $item['product_name'] . ', ';
+                            }
+                            $products = rtrim($products, ', ');
+
+                            // Display order details in the table
                             echo '
                                 <tr class="border-b">
                                     <td class="px-6 py-3">' . htmlspecialchars($order['id'], ENT_QUOTES) . '</td>
-                                    <td class="px-6 py-3">' . htmlspecialchars($order['product_name'], ENT_QUOTES) . '</td>
+                                    <td class="px-6 py-3">' . htmlspecialchars($products, ENT_QUOTES) . '</td>
                                     <td class="px-6 py-3">' . number_format($order['total'], 2) . ' Taka</td>
                                     <td class="px-6 py-3">' . htmlspecialchars($order['address'], ENT_QUOTES) . '</td>
-                                    <td class="px-6 py-3">' . htmlspecialchars($order['status'], ENT_QUOTES) . '</td>
                                     <td class="px-6 py-3">
-                                        <a href="view_order.php?id=' . $order['id'] . '" class="bg-blue-600 text-white px-4 py-2 rounded-md hover:bg-blue-700">View</a>
-                                        <a href="view_orders.php?id=' . $order['id'] . '" class="bg-red-600 text-white px-4 py-2 rounded-md hover:bg-red-700">Delete</a>
+                                        <form method="POST" action="">
+                                            <select name="status" class="px-4 py-2 border rounded-md">
+                                                <option value="pending" ' . ($order['status'] == 'pending' ? 'selected' : '') . '>Pending</option>
+                                                <option value="delivered" ' . ($order['status'] == 'delivered' ? 'selected' : '') . '>Delivered</option>
+                                                <option value="canceled" ' . ($order['status'] == 'canceled' ? 'selected' : '') . '>Canceled</option>
+                                            </select>
+                                            <input type="hidden" name="order_id" value="' . $order['id'] . '">
+                                            <button type="submit" name="update_status" class="bg-blue-600 text-white px-4 py-2 rounded-md hover:bg-blue-700 mt-2">Update</button>
+                                        </form>
+                                    </td>
+                                    <td class="px-6 py-3">
+                                        <a href="view_orders.php?id=' . $order['id'] . '&action=delete" class="bg-red-600 text-white px-4 py-2 rounded-md hover:bg-red-700">Delete</a>
                                     </td>
                                 </tr>
                             ';
@@ -132,6 +181,7 @@ if (isset($_GET['id'])) {
     <footer class="text-center py-6 bg-gray-200 text-gray-600">
         <p>&copy; 2025 Swift Buy 🛒 | All Rights Reserved</p>
     </footer>
+
 </body>
 
 </html>
