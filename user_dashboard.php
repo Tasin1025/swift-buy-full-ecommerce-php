@@ -31,7 +31,20 @@ $user = $result->fetch_assoc();
             background-size: cover;
             background-position: center;
             background-attachment: fixed;
-            padding-bottom: 50px;
+            display: flex;
+            flex-direction: column;
+            min-height: 100vh;
+        }
+
+        main {
+            flex: 1; /* Ensures content takes up the available space */
+        }
+
+        footer {
+            background-color: #f8f8f8;
+            text-align: center;
+            padding: 20px;
+            color: #4a4a4a;
         }
     </style>
 </head>
@@ -57,70 +70,60 @@ $user = $result->fetch_assoc();
         </div>
     </header>
 
-    <!-- Welcome Section -->
-    <div class="container mx-auto p-6 mt-10 bg-white shadow-md rounded-lg max-w-4xl">
-        <h1 class="text-3xl font-semibold text-center mb-6">Welcome, <?php echo htmlspecialchars($user['full_name'], ENT_QUOTES); ?>!</h1>
-        <p class="text-center mb-6">Your one-stop shop for exclusive gadgets and smart accessories.</p>
-        <p class="text-center">Swift Buy 🛒 is dedicated to providing the best and most cutting-edge gadgets and accessories. Shop with confidence and enjoy top-tier products for modern living.</p>
-    </div>
-
-    <!-- User Info Section -->
-    <div class="container mx-auto p-6 mt-10 bg-white shadow-md rounded-lg max-w-4xl">
-        <h2 class="text-xl font-semibold mb-4 text-center">Your Information</h2>
-        <div class="text-center mb-4">
-            <p><strong>Email:</strong> <?php echo htmlspecialchars($user['email'], ENT_QUOTES); ?></p>
-            <p><strong>Phone:</strong> <?php echo htmlspecialchars($user['phone'], ENT_QUOTES); ?></p>
-            <p><strong>Location:</strong> <?php echo htmlspecialchars($user['address'], ENT_QUOTES); ?></p>
-            <p><strong>Profile Picture:</strong> <img src="<?php echo htmlspecialchars($user['profile_picture'], ENT_QUOTES); ?>" alt="Profile Picture" class="w-24 h-24 rounded-full mx-auto"></p>
+    <!-- Main Content Section -->
+    <main>
+        <!-- Welcome Section -->
+        <div class="container mx-auto p-6 mt-10 bg-white shadow-md rounded-lg max-w-4xl">
+            <h1 class="text-3xl font-semibold text-center mb-6">Welcome, <?php echo htmlspecialchars($user['full_name'], ENT_QUOTES); ?>!</h1>
+            <p class="text-center mb-6">Your one-stop shop for exclusive gadgets and smart accessories.</p>
+            <p class="text-center">Swift Buy 🛒 is dedicated to providing the best and most cutting-edge gadgets and accessories. Shop with confidence and enjoy top-tier products for modern living.</p>
         </div>
-        <div class="text-center mt-4">
-            <a href="profile.php" class="bg-indigo-600 text-white px-4 py-2 rounded-md hover:bg-indigo-700">Edit Profile</a>
+
+        <!-- User Info Section -->
+        <div class="container mx-auto p-6 mt-10 bg-white shadow-md rounded-lg max-w-4xl">
+            <h2 class="text-xl font-semibold mb-4 text-center">Your Information</h2>
+            <div class="text-center mb-4">
+                <p><strong>Email:</strong> <?php echo htmlspecialchars($user['email'], ENT_QUOTES); ?></p>
+                <p><strong>Phone:</strong> <?php echo htmlspecialchars($user['phone'], ENT_QUOTES); ?></p>
+                <p><strong>Location:</strong> <?php echo htmlspecialchars($user['address'], ENT_QUOTES); ?></p>
+                <p><strong>Profile Picture:</strong> <img src="<?php echo htmlspecialchars($user['profile_picture'], ENT_QUOTES); ?>" alt="Profile Picture" class="w-24 h-24 rounded-full mx-auto"></p>
+            </div>
+            <div class="text-center mt-4">
+                <a href="profile.php" class="bg-indigo-600 text-white px-4 py-2 rounded-md hover:bg-indigo-700">Edit Profile</a>
+            </div>
         </div>
-    </div>
 
-    <!-- About Us Section -->
-    <!-- <div id="about" class="container mx-auto p-6 bg-white shadow-md rounded-lg mt-10 max-w-4xl">
-        <h1 class="text-3xl font-semibold text-center mb-6">About Us</h1>
-        <p class="text-center">Swift Buy 🛒 is dedicated to providing the best and most cutting-edge gadgets and accessories. Shop with confidence and enjoy top-tier products for modern living.</p>
-    </div> -->
-
-    <!-- Products Section -->
-    <div id="products" class="container mx-auto p-6 mt-10 bg-white shadow-md rounded-lg max-w-4xl">
-    <h2 class="text-3xl font-semibold text-center mb-6">Our Bestsellers</h2>
-    <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-8">
-        <?php
-        // Fetch products from the database
-        $sql = "SELECT * FROM products";
-        $result = $conn->query($sql);
-        if ($result->num_rows > 0) {
-            while ($row = $result->fetch_assoc()) {
-                echo '
-                    <div class="product bg-white shadow-md rounded-lg overflow-hidden text-center">
-                        <img src="' . $row['image'] . '" alt="' . htmlspecialchars($row['name'], ENT_QUOTES) . '" class="w-full h-48 object-cover">
-                        <div class="p-4">
-                            <h3 class="text-lg font-semibold">' . htmlspecialchars($row['name'], ENT_QUOTES) . '</h3>
-                            <p class="text-indigo-600 font-bold">' . number_format($row['price'], 2) . ' Taka</p>
-                           <form method="POST" action="add_to_cart.php">
-    <input type="hidden" name="product_name" value="' . htmlspecialchars($row['name'], ENT_QUOTES) . '">
-    <input type="hidden" name="product_price" value="' . $row['price'] . '">
-    <button type="submit" class="bg-indigo-600 text-white px-4 py-2 rounded-md hover:bg-indigo-700">Add to Cart</button>
-</form>
-
-                        </div>
-                    </div>
-                ';
-            }
-        } else {
-            echo "<p>No products found!</p>";
-        }
-        ?>
-    </div>
-</div>
-
-</div>
-
-    </div>
-
+        <!-- Products Section -->
+        <div id="products" class="container mx-auto p-6 mt-10 bg-white shadow-md rounded-lg max-w-4xl">
+            <h2 class="text-3xl font-semibold text-center mb-6">Our Bestsellers</h2>
+            <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-8">
+                <?php
+                // Fetch products from the database
+                $sql = "SELECT * FROM products";
+                $result = $conn->query($sql);
+                if ($result->num_rows > 0) {
+                    while ($row = $result->fetch_assoc()) {
+                        echo '
+                            <div class="product bg-white shadow-md rounded-lg overflow-hidden text-center">
+                                <img src="' . $row['image'] . '" alt="' . htmlspecialchars($row['name'], ENT_QUOTES) . '" class="w-full h-48 object-cover">
+                                <div class="p-4">
+                                    <h3 class="text-lg font-semibold">' . htmlspecialchars($row['name'], ENT_QUOTES) . '</h3>
+                                    <p class="text-indigo-600 font-bold">' . number_format($row['price'], 2) . ' Taka</p>
+                                    <form method="POST" action="add_to_cart.php">
+                                        <input type="hidden" name="product_name" value="' . htmlspecialchars($row['name'], ENT_QUOTES) . '">
+                                        <input type="hidden" name="product_price" value="' . $row['price'] . '">
+                                        <button type="submit" class="bg-indigo-600 text-white px-4 py-2 rounded-md hover:bg-indigo-700">Add to Cart</button>
+                                    </form>
+                                </div>
+                            </div>
+                        ';
+                    }
+                } else {
+                    echo "<p>No products found!</p>";
+                }
+                ?>
+            </div>
+        </div>
     <!-- Contact Us Section -->
     <div id="contact" class="container mx-auto p-6 mt-10 bg-white shadow-md rounded-lg max-w-4xl">
         <h2 class="text-3xl font-semibold text-center mb-6">Contact Us</h2>
@@ -141,6 +144,12 @@ $user = $result->fetch_assoc();
         </form>
     </div>
 
+    </main>
+
+    <!-- Footer Section -->
+    <footer class="mt-4 p-6">
+        <p>&copy; 2025 Swift Buy 🛒 | All Rights Reserved</p>
+    </footer>
 </body>
 
 </html>

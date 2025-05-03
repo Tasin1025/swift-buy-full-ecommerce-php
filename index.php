@@ -94,7 +94,7 @@ if (isset($_SESSION['user_id'])) {
                 while ($row = $result->fetch_assoc()) {
                     echo '
                         <div class="bg-white shadow-md rounded-lg overflow-hidden text-center">
-                            <img src="uploads/' . $row['image'] . '" alt="' . $row['name'] . '" class="w-full h-48 object-cover">
+                            <img src="  ' . $row['image'] . '" alt="' . $row['name'] . '" class="w-full h-48 object-cover">
                             <div class="p-4">
                                 <h3 class="text-lg font-semibold">' . $row['name'] . '</h3>
                                 <p class="text-indigo-600 font-bold">' . number_format($row['price'], 2) . ' Taka</p>
