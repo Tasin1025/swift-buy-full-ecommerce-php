@@ -17,7 +17,6 @@ $stmt->execute();
 $result = $stmt->get_result();
 $user = $result->fetch_assoc();
 
-
 // Handle order deletion
 if (isset($_GET['id']) && isset($_GET['action']) && $_GET['action'] == 'delete') {
     $order_id = intval($_GET['id']);
@@ -42,7 +41,6 @@ if (isset($_GET['id']) && isset($_GET['action']) && $_GET['action'] == 'delete')
     $stmt->close();
 }
 
-
 // Handle order status update
 if (isset($_POST['update_status'])) {
     $order_id = intval($_POST['order_id']);
@@ -61,6 +59,23 @@ if (isset($_POST['update_status'])) {
     }
     $stmt->close();
 }
+
+// Fetch orders count grouped by month
+$order_months_sql = "SELECT YEAR(created_at) AS year, MONTH(created_at) AS month, COUNT(*) AS order_count FROM orders GROUP BY YEAR(created_at), MONTH(created_at) ORDER BY year DESC, month DESC";
+$order_months_result = $conn->query($order_months_sql);
+
+$months = [];
+$order_counts = [];
+
+if ($order_months_result->num_rows > 0) {
+    while ($row = $order_months_result->fetch_assoc()) {
+        $months[] = $row['year'] . '-' . str_pad($row['month'], 2, '0', STR_PAD_LEFT);  // Format month-year
+        $order_counts[] = $row['order_count'];  // Count of orders in that month
+    }
+} else {
+    $months = ['No data available'];
+    $order_counts = [0];
+}
 ?>
 
 <!DOCTYPE html>
@@ -72,23 +87,30 @@ if (isset($_POST['update_status'])) {
     <title>Swift Buy 🛒 - Admin Orders</title>
     <link rel="icon" href="favicon.png" type="image/x-icon">
     <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script> <!-- Chart.js CDN -->
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&display=swap" rel="stylesheet">
-    <style>
-        body {
-            font-family: 'Poppins', sans-serif;
-            background-image: url('banner-tech.jpg');
-            background-size: cover;
-            background-position: center;
-            background-attachment: fixed;
-            display: flex;
-            flex-direction: column;
-            min-height: 100vh;
-        }
+   <style>
+    body {
+        font-family: 'Poppins', sans-serif;
+        background-image: url('banner-tech.jpg');
+        background-size: cover;
+        background-position: center;
+        background-attachment: fixed;
+        display: flex;
+        flex-direction: column;
+        min-height: 100vh;
+    }
 
-        main {
-            flex-grow: 1;
-        }
-    </style>
+    main {
+        flex-grow: 1;
+    }
+
+    .chart-container {
+        width: 80%;
+        margin: 30px auto;
+        margin-bottom: 40px; /* Adds space between chart and the table */
+    }
+</style>
 </head>
 
 <body class="bg-gray-100 text-gray-800">
@@ -113,6 +135,12 @@ if (isset($_POST['update_status'])) {
         <!-- Orders Section -->
         <div id="orders" class="container mx-auto p-6 mt-10 bg-white shadow-md rounded-lg max-w-4xl">
             <h2 class="text-3xl font-semibold mb-6 text-center">View Orders</h2>
+
+            <!-- Order Count Graph Section -->
+            <div class="chart-container">
+                <canvas id="orderChart"></canvas>
+            </div>
+
             <table class="min-w-full bg-white shadow-md rounded-lg">
                 <thead>
                     <tr class="bg-gray-100">
@@ -181,6 +209,36 @@ if (isset($_POST['update_status'])) {
     <footer class="text-center py-6 bg-gray-200 text-gray-600">
         <p>&copy; 2025 Swift Buy 🛒 | All Rights Reserved</p>
     </footer>
+
+    <script>
+        // Prepare data for the graph
+        const months = <?php echo json_encode($months); ?>;
+        const orderCounts = <?php echo json_encode($order_counts); ?>;
+
+        // Create the chart
+        const ctx = document.getElementById('orderChart').getContext('2d');
+        const orderChart = new Chart(ctx, {
+            type: 'bar',
+            data: {
+                labels: months,
+                datasets: [{
+                    label: 'Number of Orders',
+                    data: orderCounts,
+                    backgroundColor: 'rgba(75, 192, 192, 0.2)',
+                    borderColor: 'rgba(75, 192, 192, 1)',
+                    borderWidth: 1
+                }]
+            },
+            options: {
+                responsive: true,
+                scales: {
+                    y: {
+                        beginAtZero: true
+                    }
+                }
+            }
+        });
+    </script>
 
 </body>
 
