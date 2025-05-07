@@ -1,6 +1,7 @@
 # SwiftBuy - E-Commerce Website
 
 SwiftBuy is an e-commerce website built using **HTML**, **CSS**, **JavaScript**, **Tailwind CSS**, **PHP**, and **MySQL**. This project demonstrates skills in web development, including user authentication, database management, and dynamic product handling for an online store. It has both **user** and **admin** dashboards with various features for managing profiles, orders, and products.
+## Visit: http://swiftbuy.free.nf/
 
 ## Features
 
