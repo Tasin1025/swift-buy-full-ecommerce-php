@@ -47,7 +47,7 @@ Follow these steps to set up the project locally:
 - Open your browser and navigate to `http://localhost/swiftbuy`.
 - The website should now be running locally.
 ## Live Website
- [Placeholder for Live Website Link]
+ http://swiftbuy.free.nf/ ( not SSL secured )
 ## Login Credentials
 **Admin Login:**
 Email: admin@gmail.com
